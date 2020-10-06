@@ -14,18 +14,13 @@ class Setting extends Model
     //  create_at|update_at at schema
     public $timestamps = false;
 
-    /**
-     * Extract settings from db as key-value pair
-     * Added parameter for extracting certain setting
-     * @param null $key
-     * @return \Illuminate\Support\Collection
-     */
+
     public static function getSettings($key = null)
     {
-        $settings = $key ? self::where('key', $key)->first() : self::get();
+        $settings = $key ? Setting::where('key', $key)->first() : Setting::get();
         $collect = collect();
-        foreach ($settings as $key => $value) {
-            $collect->put($settings->key, $settings->value);
+        foreach ($settings as $setting) {
+            $collect->put($setting->key, $setting->value);
         }
         return $collect;
     }

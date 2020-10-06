@@ -215,14 +215,53 @@ We need functionality to have an option of dns changing. We need to create admin
    Route::post('/setting/store', [SettingController::class, 'store'])->name('setting.store');
    ```
 
-10. 
+10. Define setting,blade.php with form for URL callback and dropdown list . Note that Webhook will work only with https protocol.
 
+    ```php+HTML
+    <div class="form-group">
+        <label>URL Callback for Telegram Bot</label>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <ul class="nav nav-pills">
+                    <button type="button"
+                            class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                    >
+                        Action
+                        <span class="caret"></span></button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"
+                               onclick="document.getElementById('url_callback_bot') . value = '{{ url('') }}'">Insert
+                                URL</a></li>
+                        <li><a href="#">Send URL</a></li>
+                        <li><a href="#">Get Info</a></li>
+                        <li><a href="#"></a></li>
+                    </ul>
+                </ul>
+            </div>
+            {{--                                    Field with settings--}}
+            <input type="url"
+                   class="form-control"
+                   id="url_callback_bot"
+                   name="url_callback_bot"
+                   value="{{ $url_callback_bot ?? '' or '' }}">
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save</button>
+    ```
 
+11. To add new setting we need to add new filed template 
+
+### 3. Webhook Registration
+
+#### 3.1 Telegram Bot API - PHP SDK
+
+80% of actual work with telegram bot is already created for us in Telegram Bot API - PHP SDK (https://github.com/irazasyed/telegram-bot-sdk)
 
 
 ## Credentials
-
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
 
 <p align="center">
 <a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
