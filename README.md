@@ -258,69 +258,130 @@ We need functionality to have an option of dns changing. We need to create admin
 
 #### 3.1 Telegram Bot API - PHP SDK
 
-80% of actual work with telegram bot is already created for us in Telegram Bot API - PHP SDK (https://github.com/irazasyed/telegram-bot-sdk)
+80% of actual work with telegram bot is already created for us in Telegram Bot API - PHP SDK (https://github.com/irazasyed/telegram-bot-sdk) .
+
+1. Install via composer.
+
+2. Add the Service Provider 
+
+   ```php
+   Telegram\Bot\Laravel\TelegramServiceProvider::class
+   ```
+
+3. Add the alias (optional)
+
+   ```php
+    'Telegram' => Telegram\Bot\Laravel\Facades\Telegram::class,
+   ```
+
+4. Before publishing Telegram config, clear the cache, because we alter list of service providers (this config cached) 
+
+   ```bash
+   php artisan config:cache
+   ```
+
+5. Run command to publish config for Telegram
+
+   ```
+   php artisan vendor:publish --provider="Telegram\Bot\Laravel\TelegramServiceProvider"
+   ```
+
+6. In the telegram.php `'token'` will hold value of our received bot_token, 'commands' will hold commands. Put token in the array
+
+7. Clear cache
+
+#### 3.2 Guzzle
+
+https://github.com/guzzle/guzzle Guzzle is a PHP HTTP client that makes it easy to send HTTP requests and trivial to integrate with web services. Abstraction layer for http request it uses **cURL** by default. **cURL** – tool for allowing you to access data across the web and different web-sites. PHP supports **libcurl**, a library created by **Daniel Stenberg**, that allows you to connect and communicate to many different types of servers with many different types of protocols. libcurl currently supports the http, https, ftp, gopher, telnet, dict, file, and ldap protocols. **libcurl** also supports HTTPS certificates, HTTP POST, HTTP PUT, FTP uploading (this can also be done with PHP's ftp extension), HTTP form based upload, proxies, cookies, and user+password authentication. cURL allows you to send request – you can specify URL. With curl we can fetch the whole web-page, but more often we can send a request to some sort of form that requires _POST data or search that requires _GET data and return it in actual array format, xml. JSON.
+
+#### 3.3 Methods for Handling Actions
+
+Actions **send URL** and **get information** will work with telegram API, so it better to use POST, because it checks authentication.
+
+First form will set URL address from our input as an address for sending all requests from chat of our bot.
+
+Second form will retrieve information with already existing settings.
+
+Let's create method that will be called for sending data to telegram API, and it will accept parameters for reuse of code in SettingController. Base URI of client merged with relative URI. 
+
+```php
+/**
+ * @param Request $request
+ * @return RedirectResponse
+ * @throws GuzzleException
+ */
+public function getwebhookinfo (Request $request)
+{
+    $result = $this->sendTelegramData('getWebhookinfo');
+    return redirect()->route('admin.setting.index')->with('status', $result);
+}
+
+/**
+ * @param Request $request
+ * @return RedirectResponse
+ * @throws GuzzleException
+ */
+public function setwebhook (Request $request)
+{
+    $result = $this->sendTelegramData('setwebhook', [
+        'query' => ['url' => $request->url . '/' . Telegram::getAccessToken()]
+    ]);
+    return redirect()->route('admin.setting.index')->with('status', $result);
+}
+
+/**
+ * Create guzzle client and pass one argument with base URI for bot
+ * relative URI
+ * @param string $route
+ * parameter from request string relative to URI scheme, key-value pair
+ * @param array $params
+ * http request method
+ * @param string $method
+ * string is obligatory
+ * @return string
+ * @throws GuzzleException
+ */
+public function sendTelegramData($route = '', $params = [], $method = 'POST')
+{
+
+    $client = new Client(['base_uri' => 'https://api.telegram.org/bot' . Telegram::getAcessToken() . '/']);
+
+    $result = $client->request($method, $route, $params);
+
+    return (string) $result->getBody();
+}
+```
+
+Create Routes 
+
+```php
+Route::post('setting/setwebhook', [SettingController::class, 'setwebhook'])->name('setting.setwebhook');
+Route::post('setting/getwebhookinfo', [SettingController::class, 'getwebhookinfo'])->name('setting.getwebhookinfo');
+```
+
+Revise our template
+
+```php
+@if(Session::has('status'))
+    <div class="alert-info">
+        <span>{{ Session::get('status') }}</span>
+    </div>
+@endif
+```
+
 
 
 ## Credentials
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+### Laravel
 
-
-### About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-### Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-### Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-### Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-### Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-### Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
+License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+### Telegram Bot API - PHP SDK
+
+License
+
+This project is released under the [BSD 3-Clause](https://github.com/irazasyed/telegram-bot-sdk/blob/master/LICENSE) License.
 
