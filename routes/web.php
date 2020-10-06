@@ -23,6 +23,8 @@ Route::middleware(['auth'])->prefix('admin')->namespace('Backend')->name('admin.
     Route::get('/', [DashboardController::class, 'index'])->name('index');
     Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');
     Route::post('/setting/store', [SettingController::class, 'store'])->name('setting.store');
+    Route::post('setting/setwebhook', [SettingController::class, 'setwebhook'])->name('setting.setwebhook');
+    Route::post('setting/getwebhookinfo', [SettingController::class, 'getwebhookinfo'])->name('setting.getwebhookinfo');
 }
 );
 
