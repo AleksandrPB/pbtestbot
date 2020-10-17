@@ -369,7 +369,26 @@ Revise our template
 @endif
 ```
 
+#### 3.4 Token exception
 
+Override constructor in VerifyCsrfToken middleware 
+
+```php
+public function __construct(Application $app, Encrypter $encrypter)
+{
+    $this->app = $app;
+    $this->encrypter = $encrypter;
+    $this->except[] = Telegram::getAccessToken();
+}
+```
+
+Define route for processing  telegram request
+
+```php
+Route::post(Telegram::getAccessToken(), function () {
+    Telegram::commandsHandler(true);
+});
+```
 
 ## Credentials
 

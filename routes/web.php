@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\SettingController;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,12 +22,16 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->prefix('admin')->namespace('Backend')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('index');
+
     Route::get('/setting', [SettingController::class, 'index'])->name('setting.index');
     Route::post('/setting/store', [SettingController::class, 'store'])->name('setting.store');
     Route::post('setting/setwebhook', [SettingController::class, 'setwebhook'])->name('setting.setwebhook');
     Route::post('setting/getwebhookinfo', [SettingController::class, 'getwebhookinfo'])->name('setting.getwebhookinfo');
-}
-);
+});
+
+Route::post(Telegram::getAccessToken(), function () {
+    Telegram::commandsHandler(true);
+});
 
 Auth::routes();
 
