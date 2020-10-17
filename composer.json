@@ -31,9 +31,7 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [
-                "laravel/ui"
-            ]
+            "dont-discover": []
         }
     },
     "autoload": {
