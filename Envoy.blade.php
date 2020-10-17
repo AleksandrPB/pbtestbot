@@ -24,7 +24,7 @@
     $release = $path . '/releases/' . $date->format('YmdHis');
 @endsetup
 
-@servers(['production' => $user . '@104.248.112.248'])
+@servers(['production' => $user . '@159.89.4.245'])
 
 @task('clone', ['on' => $on])
     mkdir -p {{ $release }}
