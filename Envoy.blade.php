@@ -52,7 +52,7 @@
 
     php artisan config:clear
 
-    php artisan migrate --force
+{{--    php artisan migrate--}}
     php artisan clear-compiled --env=production;
     php artisan optimize --env=production
 
