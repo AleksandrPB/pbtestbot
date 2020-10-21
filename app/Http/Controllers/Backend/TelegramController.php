@@ -14,7 +14,7 @@ class TelegramController extends Controller
         $telegram = Telegram::getWebhookUpdates()['message'];
 
         if (!TelegramUser::find($telegram['from']['id'])) {
-            TelegramUser::create(json_decode($telegram['from'], true));
+            TelegramUser::create($telegram['from']);
         }
         Telegram::commandsHandler(true);
     }
