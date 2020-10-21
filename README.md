@@ -390,6 +390,94 @@ Route::post(Telegram::getAccessToken(), function () {
 });
 ```
 
+## 4. Commands
+
+In our config/telegram.php. If you'd like to use the SDK's built in command handler system, you can register all the global commands here.
+
+We create Telegram/TestCommand.php and paste and revise source code from vendor/irazasyed/src/Commands/HelpCommand 
+
+```php
+<?php
+
+
+namespace App\Telegram;
+
+use Telegram\Bot\Actions;
+use Telegram\Bot\Commands\Command;
+
+
+/**
+ * Class TestCommand.
+ */
+class TestCommand extends Command
+{
+    /**
+     * @var string Command Name
+     */
+    protected $name = 'test';
+
+    /**
+     * @var array Command Aliases
+     */
+    protected $aliases = ['listcommands'];
+
+    /**
+     * @var string Command Description
+     */
+    protected $description = 'Test command, Get a list of commands';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handle()
+    {
+        $commands = $this->telegram->getCommands();
+
+        $text = '';
+        foreach ($commands as $name => $handler) {
+            /* @var Command $handler */
+            $text .= sprintf('/%s - %s' . PHP_EOL, $name, $handler->getDescription());
+        }
+
+        $this->replyWithMessage(compact('text'));
+    }
+}
+```
+
+Add command to config file
+
+```php
+'commands'                     => [
+    App\Telegram\TestCommand::class,
+```
+
+Deploy with laravel envoy and check for our command
+
+![image-20201021105602491](/home/aleksandrpb/PhpstormProjects/larabot/pbbtestbot2/readme_files/image-20201021105602491.png)
+
+To modify our command let's add brand new  functionality
+
+```php
+public function handle()
+{
+    // add chat action that bot is typing
+    $this->replyWithChatAction(['action' => Actions::TYPING]);
+
+    $user = User::find(1);
+
+    $this->replyWithMessage(['text' => 'User\'s email' . $user->email]);
+
+    $telegram_user = Telegram::getWebhookUpdates()['message'];
+
+    $text = sprintf('%s: %s'.PHP_EOL, 'Chat id', $telegram_user['from']['id']);
+    $text .= sprintf('%s: %s'.PHP_EOL, 'Username', $telegram_user['from']['username']);
+
+    $this->replyWithMessage(compact('text'));
+}
+```
+
+
+
 ## Credentials
 
 ### Laravel
