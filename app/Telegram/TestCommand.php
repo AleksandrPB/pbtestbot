@@ -8,7 +8,7 @@ use Telegram\Bot\Actions;
 use Telegram\Bot\Commands\Command;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Telegram\Bot\Objects\Update;
-
+use Telegram\Bot\Keyboard\Keyboard;
 
 /**
  * Class TestCommand.
@@ -46,28 +46,28 @@ class TestCommand extends Command
         $text = sprintf('%s: %s' . PHP_EOL, 'Chat id', $telegram_user['from']['id']);
         $text .= sprintf('%s: %s' . PHP_EOL, 'Username', $telegram_user['from']['username']);
 
-//        $keyboard = [
-//            ['7', '8', '9'],
-//            ['4', '5', '6'],
-//            ['1', '2', '3'],
-//            ['0']
-//        ];
-//
-//        $reply_markup = Telegram::replyKeyboardMarkup(
-//            [
-//                'keyboard' => $keyboard,
-//                'resize_keyboard' => true,
-//                'one_time_keyboard' => true
-//            ]
-//        );
-//
-//        $response = Telegram::sendMessage(
-//            [
-//                'chat_id' => $telegram_user['from']['id'],
-//                'text' => 'Hello World',
-//                'reply_markup' => $reply_markup
-//            ]
-//        );
+        $keyboard = [
+            ['7', '8', '9'],
+            ['4', '5', '6'],
+            ['1', '2', '3'],
+            ['0']
+        ];
+
+        $reply_markup = Keyboard::make(
+            [
+                'keyboard' => $keyboard,
+                'resize_keyboard' => true,
+                'one_time_keyboard' => true
+            ]
+        );
+
+        $response = Telegram::sendMessage(
+            [
+                'chat_id' => $telegram_user['from']['id'],
+                'text' => 'Hello World',
+                'reply_markup' => $reply_markup
+            ]
+        );
 //
 //        $messageId = $response->getMessageId();
 
