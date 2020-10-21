@@ -20,7 +20,7 @@ class TestCommand extends Command
     /**
      * @var array Command Aliases
      */
-    protected $aliases = ['listcommands'];
+//    protected $aliases = ['listcommands'];
 
     /**
      * @var string Command Description
