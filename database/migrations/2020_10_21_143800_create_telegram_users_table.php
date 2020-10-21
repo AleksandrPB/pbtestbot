@@ -18,7 +18,7 @@ class CreateTelegramUsersTable extends Migration
             $table->boolean('is_bot')->nullable();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
-            $table->string('user_name')->nullable();
+            $table->string('username')->nullable();
             $table->string('language_code', 10);
             $table->timestamps();
         });
