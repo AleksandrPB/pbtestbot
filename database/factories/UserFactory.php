@@ -26,7 +26,7 @@ class UserFactory extends Factory
             'name' => 'admin',
             'email' => 'aburlaqqq@gmail.com',
             'email_verified_at' => now(),
-            'password' => bcrypt('1234'), // password
+            'password' => bcrypt(''), // password
             'remember_token' => Str::random(10),
         ];
     }
